@@ -3,11 +3,8 @@ const Dev = require('../models/Dev');
 const parseStringAsArray = require('../utils/parseStringAsArray');
 
 async function verifyDevInDatabase(github_username) {
-    const exist = await Dev.findOne({ github_username });
-    if (!exist)
-        return false;
-    else
-        return true;
+    const dev = await Dev.findOne({ github_username });
+    return dev;
 }
 
 module.exports = {
@@ -42,10 +39,45 @@ module.exports = {
 
         return response.json({
             result: 'success',
-            dev
+            dev,
         });
     },
     async update(request, response) {
+        const { github_username } = request.query;
+        let dev = await verifyDevInDatabase(github_username);
+        if (!dev)
+            return response.json({
+                result: 'fail',
+                message: 'dev not exist in database',
+            });
         
+        const { bio = dev.bio, techs=null } = request.body;
+        if (techs != null) {
+            const techsArray = parseStringAsArray(techs);
+            dev.techs = techsArray;
+        }
+        dev.bio = bio;
+       
+                
+        dev = await Dev.findOneAndUpdate({github_username}, dev);
+        return response.json({
+            result: 'success',
+            message: 'dev informations updated on database'
+        });
+
+    },
+    async destroy(request, response) {
+        const { github_username } = request.query;
+        if (await Dev.findOneAndDelete({ github_username })) {            
+            return response.json({
+                result: 'success',
+                message: 'dev deleted from database'
+            });
+        }        
+        else
+            return response.json({
+                result: 'fail',
+                message: 'cannot find dev in database'
+            });
     }
 }
