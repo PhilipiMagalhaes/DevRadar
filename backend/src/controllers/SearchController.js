@@ -1,12 +1,12 @@
 const Dev = require('../models/Dev');
-parseStringAsArray = require('../utils/parseStringAsArray');
+parseStringAsArrayLowerCase = require('../utils/parseStringAsArrayLowerCase');
 module.exports = {
     async index(request, response) {
         const { longitude, latitude, techs } = request.query;
-        const techsArray = parseStringAsArray(techs);
+        const techsArray = parseStringAsArrayLowerCase(techs);
 
         const devs = await Dev.find({
-            techs: {
+            techsLowerCase: {
                 $in: techsArray,
             },
             location: {
@@ -18,6 +18,17 @@ module.exports = {
                     $maxDistance: 10000,
                 },
             },
+        });
+        if (!devs.length) {
+            return response.json(
+                {
+                    result: 'fail',
+                    message: 'no dev found around with these techs'
+                })
+        }
+        return response.json({
+            result: 'success',
+            devs
         });
     }
 }
