@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Image, View, Text, TextInput, TouchableOpacity, Platform } from 'react-native';
 import MapView, { Marker, Callout } from 'react-native-maps';
 import { MaterialIcons } from '@expo/vector-icons';
+import KeyboardSpacer from 'react-native-keyboard-spacer';
 import * as Location from 'expo-location';
 import api from '../services/api';
 
@@ -100,14 +101,6 @@ export default function Main({ navigation }) {
                     placeholderTextColor='#999'
                     autoCapitalize='words'
                     autoCorrect={false}     
-                    onFocus={() => {
-                        if (Platform.OS === 'ios')
-                            setInputBottomValue(230)
-                    }}
-                    onEndEditing={() => {
-                        if (Platform.OS === 'ios')
-                            setInputBottomValue(20)
-                    }}
                     value={techSearchParams}
                     onChangeText={setTechSearchParam}
                 />
@@ -120,8 +113,9 @@ export default function Main({ navigation }) {
                         color='#fff'
                     />
                 </TouchableOpacity>
+              <KeyboardSpacer topSpacing={50}/>
             </View >
-        </>
+            </>
     );
 }
 
